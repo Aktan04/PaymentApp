@@ -1,6 +1,49 @@
-﻿services:
-  paymentapi:
-    image: paymentapi
+﻿version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: paymentapi-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: As161815
+      POSTGRES_DB: paymentDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d paymentDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - paymentapi-network
+    restart: unless-stopped
+
+  api:
     build:
-      context: .
-      dockerfile: PaymentAPI/Dockerfile
+      context: ./PaymentAPI
+      dockerfile: ./Dockerfile
+    container_name: paymentapi-app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://localhost:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=paymentDb;Username=postgres;Password=postgres
+      - JwtSettings__SecretKey=40bc9dbc9ddbbf015c8056bdc87c4e1e
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - paymentapi-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  paymentapi-network:
+    driver: bridge
