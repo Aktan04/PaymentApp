@@ -1,0 +1,6 @@
+﻿services:
+  paymentapi:
+    image: paymentapi
+    build:
+      context: .
+      dockerfile: PaymentAPI/Dockerfile
