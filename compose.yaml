@@ -28,7 +28,7 @@ services:
     container_name: paymentapi-app
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://localhost:8080
+      - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=paymentDb;Username=postgres;Password=postgres
       - JwtSettings__SecretKey=40bc9dbc9ddbbf015c8056bdc87c4e1e
     ports:
